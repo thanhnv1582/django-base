@@ -1,0 +1,145 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  PYTHON_VERSION: "3.12"
+  POETRY_VERSION: "1.8.3"
+
+jobs:
+  # ─── Lint & Format ──────────────────────────────────────────────────────────
+  lint:
+    name: Lint & Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: ${{ env.POETRY_VERSION }}
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dev dependencies
+        run: poetry install --with dev
+
+      - name: Run Ruff linter
+        run: poetry run ruff check src/ tests/
+
+      - name: Check formatting (Black)
+        run: poetry run black --check src/ tests/
+
+  # ─── Security Scan ──────────────────────────────────────────────────────────
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: ${{ env.POETRY_VERSION }}
+
+      - name: Install dependencies
+        run: poetry install --with dev
+
+      - name: Run Bandit security scan
+        run: poetry run bandit -r src/ -ll -f json -o bandit-report.json
+
+      - name: Upload Bandit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bandit-report
+          path: bandit-report.json
+
+  # ─── Tests ──────────────────────────────────────────────────────────────────
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: test_db
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_pass
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: ${{ env.POETRY_VERSION }}
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        run: poetry install --with dev
+
+      - name: Create .env for tests
+        run: |
+          cat > .env << EOF
+          SECRET_KEY=test-secret-key-for-ci-only
+          DEBUG=False
+          DB_NAME=test_db
+          DB_USER=test_user
+          DB_PASSWORD=test_pass
+          DB_HOST=localhost
+          DB_PORT=5432
+          REDIS_URL=redis://localhost:6379/0
+          CELERY_BROKER_URL=redis://localhost:6379/1
+          CELERY_RESULT_BACKEND=redis://localhost:6379/2
+          EOF
+
+      - name: Run tests with coverage
+        run: |
+          DJANGO_SETTINGS_MODULE=config.settings.test \
+          poetry run pytest tests/ -v \
+            --cov=src \
+            --cov-report=xml \
+            --cov-report=term-missing \
+            --cov-fail-under=70
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: coverage.xml
+          flags: unittests

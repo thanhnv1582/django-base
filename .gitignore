@@ -1,0 +1,64 @@
+# ─── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+wheels/
+.installed.cfg
+lib/
+lib64/
+
+# ─── Django ───────────────────────────────────────────────────────────────────
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+staticfiles/
+media/
+
+# ─── Virtual Environments ─────────────────────────────────────────────────────
+.env
+.venv/
+env/
+venv/
+ENV/
+.python-version
+
+# ─── Testing & Coverage ───────────────────────────────────────────────────────
+.tox/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+bandit-report.json
+audit-report.json
+
+# ─── IDEs ─────────────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# ─── Docker ───────────────────────────────────────────────────────────────────
+# (docker-compose files are committed)
+
+# ─── Logs ─────────────────────────────────────────────────────────────────────
+logs/
+*.log
+/var/log/
+
+# ─── Poetry ───────────────────────────────────────────────────────────────────
+# poetry.lock IS committed (for reproducibility)

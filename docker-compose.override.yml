@@ -1,0 +1,25 @@
+# Development overrides — rebuild on code change, expose ports, dev settings
+version: "3.9"
+
+services:
+  app:
+    build:
+      target: builder   # Use builder stage (includes Poetry) for volume mount
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app          # Mount source for hot reload
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.dev
+    ports:
+      - "8000:8000"
+
+  celery:
+    command: celery -A config.celery worker --loglevel=debug --concurrency=1
+    volumes:
+      - .:/app
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.dev
+
+  # No nginx in dev — app directly on port 8000
+  nginx:
+    profiles: ["production"]  # Only start nginx when profile=production

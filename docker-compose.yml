@@ -1,0 +1,139 @@
+version: "3.9"
+
+# =============================================================================
+# Full-stack Docker Compose
+# Services: app, postgres, redis, celery, flower, nginx
+# =============================================================================
+
+x-app-common: &app-common
+  build:
+    context: .
+    dockerfile: Dockerfile
+    target: runner
+  volumes:
+    - static_volume:/app/staticfiles
+    - media_volume:/app/media
+  env_file:
+    - .env
+  depends_on:
+    postgres:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+  restart: unless-stopped
+
+services:
+
+  # ─── Django Application ────────────────────────────────────────────────────
+  app:
+    <<: *app-common
+    container_name: seminar_app
+    expose:
+      - "8000"
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.prod
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ─── PostgreSQL ────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: seminar_postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME:-seminar_db}
+      POSTGRES_USER: ${DB_USER:-seminar_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-seminar_pass}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-seminar_user} -d ${DB_NAME:-seminar_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ─── Redis ────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: seminar_redis
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-}
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ─── Celery Worker ────────────────────────────────────────────────────────
+  celery:
+    <<: *app-common
+    container_name: seminar_celery
+    command: celery -A config.celery worker --loglevel=info --concurrency=4
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.prod
+    healthcheck:
+      test: ["CMD", "celery", "-A", "config.celery", "inspect", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ─── Celery Beat (Scheduler) ───────────────────────────────────────────────
+  celery-beat:
+    <<: *app-common
+    container_name: seminar_celery_beat
+    command: celery -A config.celery beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.prod
+
+  # ─── Flower (Celery Monitor UI) ────────────────────────────────────────────
+  flower:
+    <<: *app-common
+    container_name: seminar_flower
+    command: celery -A config.celery flower --port=5555
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.prod
+    ports:
+      - "5555:5555"
+
+  # ─── Nginx (Reverse Proxy + Static) ───────────────────────────────────────
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: seminar_nginx
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
+      - static_volume:/app/staticfiles:ro
+      - media_volume:/app/media:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - app
+    restart: unless-stopped
+
+# =============================================================================
+# Volumes
+# =============================================================================
+volumes:
+  postgres_data:
+  redis_data:
+  static_volume:
+  media_volume:
+
+# =============================================================================
+# Networks
+# =============================================================================
+networks:
+  default:
+    name: seminar_network

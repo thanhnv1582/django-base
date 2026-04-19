@@ -1,0 +1,156 @@
+[tool.poetry]
+name = "python-seminar"
+version = "0.1.0"
+description = "Django Senior — DDD & Clean Architecture"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{ include = "src" }]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+# Django Core
+django = "^5.0"
+djangorestframework = "^3.15"
+django-environ = "^0.11"
+
+# Auth & Security
+djangorestframework-simplejwt = "^5.3"
+django-cors-headers = "^4.3"
+
+# API Docs
+drf-spectacular = "^0.27"
+
+# Database
+psycopg2-binary = "^2.9"
+django-redis = "^5.4"
+
+# Background Tasks
+celery = { version = "^5.3", extras = ["redis"] }
+flower = "^2.0"
+
+# Observability
+sentry-sdk = { version = "^2.0", extras = ["django"] }
+django-prometheus = "^2.3"
+structlog = "^24.0"
+
+# Storage
+django-storages = { version = "^1.14", extras = ["boto3"] }
+
+# HTTP Server
+gunicorn = "^22.0"
+whitenoise = "^6.7"
+
+[tool.poetry.group.dev.dependencies]
+# Testing
+pytest = "^8.2"
+pytest-django = "^4.8"
+pytest-cov = "^5.0"
+pytest-asyncio = "^0.23"
+factory-boy = "^3.3"
+faker = "^25.0"
+httpx = "^0.27"
+
+# Linting & Formatting
+ruff = "^0.4"
+black = "^24.4"
+
+# Security
+bandit = { version = "^1.7", extras = ["toml"] }
+pip-audit = "^2.7"
+
+# Dev Tools
+django-debug-toolbar = "^4.3"
+pre-commit = "^3.7"
+ipython = "^8.24"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+# =============================================================================
+# Ruff — Linter config
+# =============================================================================
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["src"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+    "S",   # flake8-bandit (security)
+    "DJ",  # flake8-django
+]
+ignore = [
+    "S101",  # assert used (OK in tests)
+    "S105",  # hardcoded password (false positives in config)
+    "B008",  # function calls in default args (needed for DRF)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S", "B"]
+"src/config/settings/*.py" = ["F401", "F403"]
+
+# =============================================================================
+# Black — Formatter config
+# =============================================================================
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+include = '\.pyi?$'
+
+# =============================================================================
+# Pytest config
+# =============================================================================
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.test"
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = [
+    "--strict-markers",
+    "--tb=short",
+    "--cov=src",
+    "--cov-report=term-missing",
+    "--cov-fail-under=70",
+]
+markers = [
+    "unit: Unit tests (no DB, no external services)",
+    "integration: Integration tests (DB required)",
+    "e2e: End-to-end tests (full stack)",
+]
+
+# =============================================================================
+# Coverage config
+# =============================================================================
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "*/migrations/*",
+    "*/tests/*",
+    "src/config/settings/*",
+    "manage.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+    "pass",
+]
+
+# =============================================================================
+# Bandit — Security scanner config
+# =============================================================================
+[tool.bandit]
+targets = ["src"]
+exclude_dirs = ["tests", "src/config/settings"]
+skips = ["B101", "B603"]
