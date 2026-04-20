@@ -12,8 +12,13 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     POETRY_VERSION=1.8.3 \
     POETRY_HOME="/opt/poetry" \
-    POETRY_VIRTUALENVS_IN_PROJECT=true \
-    POETRY_NO_INTERACTION=1
+    POETRY_VIRTUALENVS_CREATE=false \
+    POETRY_NO_INTERACTION=1 \
+    VIRTUAL_ENV=/opt/venv \
+    PYTHONPATH=/app/src
+
+RUN python3 -m venv $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$POETRY_HOME/bin:$PATH"
 
 # Install system dependencies for building Python packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -24,15 +29,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Install Poetry
 RUN curl -sSL https://install.python-poetry.org | python3 -
-ENV PATH="$POETRY_HOME/bin:$PATH"
 
 WORKDIR /app
 
 # Copy dependency files only (for better layer caching)
 COPY pyproject.toml poetry.lock* ./
 
-# Install production dependencies only (no dev deps)
-RUN poetry install --only=main --no-root
+# Create dummy src directory to satisfy Poetry's package check
+RUN mkdir src && touch src/__init__.py
+
+# Install dependencies (default to all, including dev for staging/builder stage)
+RUN poetry install --no-root
 
 # =============================================================================
 # ─── Stage 2: Runner (Production) ────────────────────────────────────────────
@@ -40,7 +47,8 @@ FROM python:3.12-slim AS runner
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    DJANGO_SETTINGS_MODULE=config.settings.prod
+    DJANGO_SETTINGS_MODULE=config.settings.prod \
+    PYTHONPATH=/app/src
 
 # Install runtime system dependencies only
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -54,8 +62,8 @@ RUN groupadd --gid 1001 appgroup && \
 WORKDIR /app
 
 # Copy virtualenv from builder stage (lean copy — no Poetry/build tools)
-COPY --from=builder /app/.venv /app/.venv
-ENV PATH="/app/.venv/bin:$PATH"
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
 # Copy application source
 COPY --chown=appuser:appgroup . .

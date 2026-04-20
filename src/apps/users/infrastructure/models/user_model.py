@@ -12,10 +12,10 @@ from django.db import models
 from core.base.model import SoftDeleteModel, UUIDModel
 
 
-class UserModelManager(BaseUserManager):
+class UserManager(BaseUserManager):
     """Custom manager for User model."""
 
-    def create_user(self, email: str, password: str | None = None, **extra_fields) -> "UserModel":
+    def create_user(self, email: str, password: str | None = None, **extra_fields) -> "User":
         if not email:
             raise ValueError("Email is required.")
         email = self.normalize_email(email)
@@ -24,14 +24,14 @@ class UserModelManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email: str, password: str, **extra_fields) -> "UserModel":
+    def create_superuser(self, email: str, password: str, **extra_fields) -> "User":
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("is_admin", True)
         return self.create_user(email, password, **extra_fields)
 
 
-class UserModel(AbstractBaseUser, PermissionsMixin, UUIDModel, SoftDeleteModel):
+class User(AbstractBaseUser, PermissionsMixin, UUIDModel, SoftDeleteModel):
     """
     Django ORM User model.
 
@@ -48,9 +48,10 @@ class UserModel(AbstractBaseUser, PermissionsMixin, UUIDModel, SoftDeleteModel):
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["full_name"]
 
-    objects = UserModelManager()
+    objects = UserManager()
 
     class Meta:
+        app_label = "users"
         db_table = "users"
         verbose_name = "user"
         verbose_name_plural = "users"

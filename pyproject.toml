@@ -28,11 +28,13 @@ django-redis = "^5.4"
 # Background Tasks
 celery = { version = "^5.3", extras = ["redis"] }
 flower = "^2.0"
+django-celery-beat = "^2.6"
 
 # Observability
 sentry-sdk = { version = "^2.0", extras = ["django"] }
 django-prometheus = "^2.3"
 structlog = "^24.0"
+django-filter = "^24.2"
 
 # Storage
 django-storages = { version = "^1.14", extras = ["boto3"] }

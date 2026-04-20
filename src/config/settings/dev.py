@@ -10,7 +10,14 @@ INSTALLED_APPS += ["debug_toolbar"]  # noqa: F405
 # Dev-only middleware (Debug Toolbar must be early)
 MIDDLEWARE = ["debug_toolbar.middleware.DebugToolbarMiddleware"] + MIDDLEWARE  # noqa: F405
 
-INTERNAL_IPS = ["127.0.0.1"]
+# Allow internal IPs (needed for Debug Toolbar)
+import socket
+
+try:
+    hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
+    INTERNAL_IPS = [ip[:-1] + "1" for ip in ips] + ["127.0.0.1", "10.0.2.2"]
+except Exception:
+    INTERNAL_IPS = ["127.0.0.1", "10.0.2.2"]
 
 # Simple email backend (print to console)
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

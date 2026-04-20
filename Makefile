@@ -82,6 +82,12 @@ docker-shell: ## Shell into app container
 docker-migrate: ## Run migrations inside Docker
 	docker-compose exec app python manage.py migrate
 
+docker-createsuperuser: ## Create superuser inside Docker
+	docker-compose exec app python manage.py createsuperuser
+
+docker-python: ## Run arbitrary python command inside Docker (e.g. make docker-python CMD="manage.py shell")
+	docker-compose exec app python $(CMD)
+
 docker-restart: ## Restart app service
 	docker-compose restart app
 

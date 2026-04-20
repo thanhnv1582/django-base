@@ -1,5 +1,6 @@
 """Root URL configuration."""
 from django.contrib import admin
+from django.conf import settings
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
@@ -21,3 +22,10 @@ urlpatterns = [
     # Prometheus metrics
     path("", include("django_prometheus.urls")),
 ]
+
+if settings.DEBUG:
+    try:
+        import debug_toolbar
+        urlpatterns += [path("__debug__/", include(debug_toolbar.urls))]
+    except ImportError:
+        pass

@@ -1,7 +1,7 @@
 """
 Django ORM implementation of UserRepository.
 
-Translates between UserEntity (domain) and UserModel (ORM).
+Translates between UserEntity (domain) and User (ORM).
 This is the ONLY place where Django ORM touches domain objects.
 """
 from __future__ import annotations
@@ -13,7 +13,7 @@ from apps.users.domain.entities.user import UserEntity
 from apps.users.domain.repositories.user_repository import UserRepository
 from apps.users.domain.value_objects.email import Email
 from apps.users.domain.value_objects.full_name import FullName
-from apps.users.infrastructure.models.user_model import UserModel
+from apps.users.infrastructure.models.user_model import User
 
 
 class DjangoUserRepository:
@@ -27,20 +27,20 @@ class DjangoUserRepository:
 
     def find_by_id(self, id: uuid.UUID) -> Optional[UserEntity]:
         try:
-            model = UserModel.objects.get(id=id)
+            model = User.objects.get(id=id)
             return self._to_entity(model)
-        except UserModel.DoesNotExist:
+        except User.DoesNotExist:
             return None
 
     def find_by_email(self, email: str) -> Optional[UserEntity]:
         try:
-            model = UserModel.objects.get(email=email.lower().strip())
+            model = User.objects.get(email=email.lower().strip())
             return self._to_entity(model)
-        except UserModel.DoesNotExist:
+        except User.DoesNotExist:
             return None
 
     def exists_by_email(self, email: str) -> bool:
-        return UserModel.objects.filter(email=email.lower().strip()).exists()
+        return User.objects.filter(email=email.lower().strip()).exists()
 
     def save(self, user: UserEntity, password: str | None = None) -> UserEntity:
         """
@@ -48,9 +48,9 @@ class DjangoUserRepository:
         If password is provided, it will be hashed via set_password().
         """
         try:
-            model = UserModel.objects.get(id=user.id)
-        except UserModel.DoesNotExist:
-            model = UserModel(id=user.id)
+            model = User.objects.get(id=user.id)
+        except User.DoesNotExist:
+            model = User(id=user.id)
 
         model.email = user.email.value
         model.full_name = user.full_name.value
@@ -65,12 +65,12 @@ class DjangoUserRepository:
 
     def delete(self, id: uuid.UUID) -> None:
         """Soft-delete by UUID."""
-        UserModel.objects.filter(id=id).update(is_deleted=True)
+        User.objects.filter(id=id).update(is_deleted=True)
 
     # ── Private mapping helpers ───────────────────────────────────────────────
 
     @staticmethod
-    def _to_entity(model: UserModel) -> UserEntity:
+    def _to_entity(model: User) -> UserEntity:
         """Map ORM model → domain entity."""
         entity = UserEntity(
             id=model.id,

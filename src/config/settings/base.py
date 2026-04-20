@@ -6,6 +6,7 @@ from datetime import timedelta
 from pathlib import Path
 
 import environ
+import structlog
 
 # ─── Paths ────────────────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent.parent  # → src/
@@ -243,13 +244,26 @@ if SENTRY_DSN:
     )
 
 # ─── Logging (Structured) ─────────────────────────────────────────────────────
+structlog.configure(
+    processors=[
+        structlog.contextvars.merge_contextvars,
+        structlog.processors.add_log_level,
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.format_exc_info,
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
+    ],
+    logger_factory=structlog.stdlib.LoggerFactory(),
+    cache_logger_on_first_use=True,
+)
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
         "json": {
             "()": "structlog.stdlib.ProcessorFormatter",
-            "processor": "structlog.dev.ConsoleRenderer",
+            "processor": structlog.dev.ConsoleRenderer(),
         },
     },
     "handlers": {
