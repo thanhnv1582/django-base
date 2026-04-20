@@ -46,8 +46,13 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{% url 'dashboard:user-list' %}" class="nav-item active">
+                        <a href="{% url 'dashboard:user-list' %}" class="nav-item {% if '/dashboard/users/' in request.path %}active{% endif %}">
                             <i data-lucide="users"></i> Users
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'dashboard:store-list' %}" class="nav-item {% if '/dashboard/stores/' in request.path %}active{% endif %}">
+                            <i data-lucide="shopping-bag"></i> Stores
                         </a>
                     </li>
                     <li>

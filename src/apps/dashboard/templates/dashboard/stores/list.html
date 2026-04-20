@@ -1,0 +1,81 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Store Management - Nexus Digital Atelier{% endblock %}
+
+{% block content %}
+<!-- Editorial Header Section -->
+<div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 3rem;">
+    <div>
+        <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--primary); font-weight: 700;">Inventory</span>
+        <h1 class="headline" style="font-size: 2.5rem; margin-top: 0.5rem;">Store Directory</h1>
+    </div>
+    <div style="display: flex; gap: 1rem;">
+        <button class="btn-cute">
+            <i data-lucide="plus"></i> Open New Store
+        </button>
+    </div>
+</div>
+
+<!-- The "Editorial Card" Container -->
+<div class="card" style="padding: 1rem;">
+    <table class="cute-table">
+        <thead>
+            <tr>
+                <th>Identity</th>
+                <th>Location</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for store in stores %}
+            <tr>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div style="width: 44px; height: 44px; background: #f0f4f8; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--primary); overflow: hidden;">
+                            {% if store.logo %}
+                                <img src="{{ store.logo }}" style="width: 100%; height: 100%; object-fit: cover;">
+                            {% else %}
+                                {{ store.name|slice:":1"|upper }}
+                            {% endif %}
+                        </div>
+                        <div>
+                            <div style="font-weight: 600; font-family: 'Manrope', sans-serif;">{{ store.name }}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">Slug: {{ store.slug }}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div style="font-size: 0.9rem;">{{ store.address|default:"No address set" }}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">{{ store.phone }}</div>
+                </td>
+                <td>
+                    <div id="status-{{ store.id }}">
+                        <div class="status-badge {% if store.is_active %}active{% else %}inactive{% endif %}">
+                            {{ store.is_active|yesno:"Active,Inactive" }}
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button style="background: none; border: none; padding: 0.5rem; color: var(--text-muted); cursor: pointer; transition: var(--transition);">
+                            <i data-lucide="edit-2" style="width: 18px;"></i>
+                        </button>
+                        <button style="background: none; border: none; padding: 0.5rem; color: var(--danger); cursor: pointer; transition: var(--transition);">
+                            <i data-lucide="trash-2" style="width: 18px;"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align: center; padding: 5rem 0;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🏬</div>
+                    <div style="font-family: 'Manrope', sans-serif; font-weight: 600; color: var(--text-muted);">No stores found in this atelier.</div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
