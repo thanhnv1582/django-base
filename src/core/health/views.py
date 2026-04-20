@@ -26,6 +26,7 @@ class HealthCheckView(APIView):
 
     permission_classes = [AllowAny]
     authentication_classes = []
+    throttle_classes = []
 
     @extend_schema(exclude=True)  # Don't show in Swagger
     def get(self, request: Request) -> Response:
