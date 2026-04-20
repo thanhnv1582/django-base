@@ -17,6 +17,18 @@ class RegisterUserInput:
 
 
 @dataclass(frozen=True)
+class ListUsersInput:
+    """Input for ListUsersUseCase."""
+    page: int = 1
+    page_size: int = 20
+@dataclass(frozen=True)
+class ListUsersInput:
+    """Input for ListUsersUseCase."""
+    page: int = 1
+    page_size: int = 20
+
+
+@dataclass(frozen=True)
 class UpdateProfileInput:
     """Input for UpdateProfileUseCase."""
     user_id: uuid.UUID
@@ -58,3 +70,12 @@ class UserOutput:
             created_at=user.created_at,
             updated_at=user.updated_at,
         )
+
+
+@dataclass(frozen=True)
+class PaginatedUserOutput:
+    """Paginated user list response."""
+    items: list[UserOutput]
+    total: int
+    page: int
+    page_size: int

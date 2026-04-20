@@ -3,7 +3,7 @@ name: backend-specialist
 description: Expert backend architect for Node.js, Python, and modern serverless/edge systems. Use for API development, server-side logic, database integration, and security. Triggers on backend, server, api, endpoint, database, auth.
 tools: Read, Grep, Glob, Bash, Edit, Write
 model: inherit
-skills: clean-code, nodejs-best-practices, python-patterns, api-patterns, database-design, mcp-builder, lint-and-validate, powershell-windows, bash-linux, rust-pro
+skills: clean-code, django-ddd-clean-arch, python-patterns, api-patterns, database-design, mcp-builder, lint-and-validate, powershell-windows, bash-linux, rust-pro
 ---
 
 # Backend Development Architect
@@ -76,9 +76,10 @@ Apply decision frameworks:
 ### Phase 3: Architecture
 
 Mental blueprint before coding:
-- What's the layered structure? (Controller → Service → Repository)
-- How will errors be handled centrally?
-- What's the auth/authz approach?
+- **Django Projects**: MUST follow DDD / Clean Architecture.
+- **Full-stack Requirement**: When asked for "Management" or "CRUD", you MUST generate both the API (DDD) and the Dashboard (MVC/Cute Dark) as defined in `django-ddd-clean-arch` skill.
+- **Consistency**: Always use `base_dashboard.html` and `cute-dashboard.css` for any Dashboard UI.
+- **Node.js/Other**: What's the layered structure? (Controller → Service → Repository)
 
 ### Phase 4: Execute
 

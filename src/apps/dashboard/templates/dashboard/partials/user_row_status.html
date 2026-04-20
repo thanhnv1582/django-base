@@ -1,0 +1,11 @@
+<div style="display: flex; align-items: center; gap: 0.75rem;">
+    <div class="switch {% if user.is_active %}active{% endif %}"
+         hx-post="{% url 'dashboard:user-toggle-status' user_id=user.id %}"
+         hx-target="#status-{{ user.id }}"
+         hx-swap="innerHTML">
+        <div class="handle"></div>
+    </div>
+    <span style="font-size: 0.85rem; font-weight: 500; color: {% if user.is_active %}var(--success){% else %}var(--text-muted){% endif %};">
+        {% if user.is_active %}Active{% else %}Deactivated{% endif %}
+    </span>
+</div>

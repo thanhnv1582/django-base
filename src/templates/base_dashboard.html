@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboard - Nexus Digital Atelier{% endblock %}</title>
+    
+    <!-- Nexus Typography: Manrope & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/cute-dashboard.css' %}">
+    
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script>
+        document.body.addEventListener('htmx:configRequest', (event) => {
+            event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+        });
+    </script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand" style="margin-bottom: 3rem;">
+                <h2 style="font-size: 1.5rem; color: var(--primary); display: flex; align-items: center; gap: 0.75rem;">
+                    <i data-lucide="layout-dashboard"></i>
+                    Nexus
+                </h2>
+            </div>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li>
+                        <a href="#" class="nav-item">
+                            <i data-lucide="bar-chart-2"></i> Overivew
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'dashboard:user-list' %}" class="nav-item active">
+                            <i data-lucide="users"></i> Users
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-item">
+                            <i data-lucide="package"></i> Products
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-item">
+                            <i data-lucide="settings"></i> System
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div style="margin-top: auto; padding-top: 2rem; border-top: 1px solid var(--outline);">
+                <div style="display: flex; align-items: center; gap: 1rem; color: var(--text-muted);">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center;">
+                        <i data-lucide="user" style="width: 16px;"></i>
+                    </div>
+                    <span style="font-size: 0.85rem; font-weight: 500;">Admin Studio</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- Stickers (Transparently integrated) -->
+    <div class="sticker sticker-heart">
+        <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

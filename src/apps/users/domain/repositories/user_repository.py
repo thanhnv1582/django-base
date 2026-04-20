@@ -35,3 +35,11 @@ class UserRepository(Protocol):
     def delete(self, id: uuid.UUID) -> None:
         """Soft-delete a user by UUID."""
         ...
+
+    def list_all(self, offset: int = 0, limit: int = 20) -> list[UserEntity]:
+        """List all users with pagination."""
+        ...
+
+    def total_count(self) -> int:
+        """Return the total number of users."""
+        ...

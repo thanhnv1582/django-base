@@ -67,6 +67,15 @@ class DjangoUserRepository:
         """Soft-delete by UUID."""
         User.objects.filter(id=id).update(is_deleted=True)
 
+    def list_all(self, offset: int = 0, limit: int = 20) -> list[UserEntity]:
+        """List all users with pagination."""
+        models = User.objects.all()[offset : offset + limit]
+        return [self._to_entity(m) for m in models]
+
+    def total_count(self) -> int:
+        """Return the total number of users."""
+        return User.objects.count()
+
     # ── Private mapping helpers ───────────────────────────────────────────────
 
     @staticmethod

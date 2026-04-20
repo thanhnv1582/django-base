@@ -11,6 +11,9 @@ urlpatterns = [
     # API v1
     path("api/v1/", include("apps.users.presentation.v1.urls")),
 
+    # Dashboard
+    path("dashboard/", include("apps.dashboard.presentation.urls")),
+
     # Health Check
     path("api/health/", include("core.health.urls")),
 

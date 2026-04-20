@@ -1,0 +1,94 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}User Directory - Nexus Digital Atelier{% endblock %}
+
+{% block content %}
+<!-- Editorial Header Section -->
+<div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 3rem;">
+    <div>
+        <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--primary); font-weight: 700;">Workspace</span>
+        <h1 class="headline" style="font-size: 2.5rem; margin-top: 0.5rem;">User Directory</h1>
+    </div>
+    <div style="display: flex; gap: 1rem;">
+        <button class="btn-cute" style="background: white; color: var(--text-main); box-shadow: var(--shadow-ambient);">
+            <i data-lucide="download"></i> Export
+        </button>
+        <button class="btn-cute">
+            <i data-lucide="plus"></i> Add Entity
+        </button>
+    </div>
+</div>
+
+<!-- The "Editorial Card" Container -->
+<div class="card" style="padding: 1rem;">
+    <table class="cute-table">
+        <thead>
+            <tr>
+                <th>Identity</th>
+                <th>Contact</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div style="width: 44px; height: 44px; background: #f0f4f8; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--primary);">
+                            {{ user.full_name|slice:":1"|upper }}
+                        </div>
+                        <div>
+                            <div style="font-weight: 600; font-family: 'Manrope', sans-serif;">{{ user.full_name }}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">UID: {{ user.id|truncatechars:12 }}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div style="font-size: 0.9rem;">{{ user.email }}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Primary Email</div>
+                </td>
+                <td>
+                    <div id="status-{{ user.id }}">
+                        {% include "dashboard/partials/user_row_status.html" with user=user %}
+                    </div>
+                </td>
+                <td>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button style="background: none; border: none; padding: 0.5rem; color: var(--text-muted); cursor: pointer; transition: var(--transition);">
+                            <i data-lucide="edit-2" style="width: 18px;"></i>
+                        </button>
+                        <button style="background: none; border: none; padding: 0.5rem; color: var(--danger); cursor: pointer; transition: var(--transition);">
+                            <i data-lucide="trash-2" style="width: 18px;"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align: center; padding: 5rem 0;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">📁</div>
+                    <div style="font-family: 'Manrope', sans-serif; font-weight: 600; color: var(--text-muted);">No records found in this atelier.</div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Nexus Styled Pagination -->
+    {% if total_pages > 1 %}
+    <div style="margin-top: 3rem; display: flex; justify-content: space-between; align-items: center; padding: 0 1rem;">
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Page {{ page }} of {{ total_pages }}</span>
+        <div style="display: flex; gap: 0.5rem;">
+            {% for p in "x"|rjust:total_pages %}
+                <a href="?page={{ forloop.counter }}" 
+                   style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: var(--transition);
+                   {% if page == forloop.counter %}background: var(--primary); color: white;{% else %}background: #f1f5f9; color: var(--text-muted);{% endif %}">
+                    {{ forloop.counter }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
