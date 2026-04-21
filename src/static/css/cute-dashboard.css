@@ -1,22 +1,27 @@
 /* Nexus Digital Atelier Design System — Premium Light Theme */
 
 :root {
-    --primary: #4F46E5;
-    --primary-dark: #3525cd;
+    --primary: #3525cd;
+    --primary-dark: #1e127d;
     --primary-light: #e2dfff;
+    --secondary: #006591;
+    --secondary-light: #c9e6ff;
     --bg-page: #f7f9fb;
     --surface: #ffffff;
+    --surface-low: #f2f4f6;
+    --surface-lowest: #ffffff;
     --sidebar-bg: #f2f4f6;
     --text-main: #191c1e;
     --text-muted: #464555;
     --success: #059669;
-    --danger: #dc2626;
-    --outline: rgba(119, 117, 135, 0.1);
+    --danger: #ba1a1a;
+    --outline: rgba(119, 117, 135, 0.15);
     --radius-lg: 16px;
+    --radius-xl: 24px;
     --radius-md: 12px;
     --radius-sm: 8px;
     --shadow-ambient: 0 8px 24px -4px rgba(25, 28, 30, 0.06);
-    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 * {
@@ -77,19 +82,20 @@ h1, h2, h3, h4, .headline {
     padding: 0.8rem 1.2rem;
     color: var(--text-muted);
     text-decoration: none;
-    border-radius: var(--radius-md);
+    border-radius: 100px; /* Pill shape */
     font-weight: 500;
     transition: var(--transition);
 }
 
 .nav-item:hover {
-    background: rgba(79, 70, 229, 0.05);
+    background: rgba(53, 37, 205, 0.05);
     color: var(--primary);
 }
 
 .nav-item.active {
     background: var(--primary-light);
-    color: var(--primary-dark);
+    color: var(--primary);
+    font-weight: 600;
 }
 
 /* Card - The Editorial Look */
@@ -193,3 +199,20 @@ h1, h2, h3, h4, .headline {
 }
 .sticker-heart { width: 120px; top: 10%; right: 5%; color: var(--primary); }
 .sticker-star { width: 80px; bottom: 15%; right: 10%; color: #FFD700; }
+
+/* Utility: Glassmorphism */
+.glass {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Utility: Gradients */
+.bg-gradient-primary {
+    background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+}
+
+.bg-gradient-secondary {
+    background: linear-gradient(180deg, var(--secondary) 0%, var(--secondary-light) 60%);
+}
