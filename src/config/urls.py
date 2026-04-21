@@ -11,6 +11,7 @@ urlpatterns = [
     # API v1
     path("api/v1/users/", include("apps.users.presentation.v1.urls")),
     path("api/v1/stores/", include("apps.stores.presentation.v1.urls")),
+    path("api/v1/vouchers/", include("apps.vouchers.presentation.v1.urls")),
 
     # Dashboard
     path("dashboard/", include("apps.dashboard.presentation.urls")),

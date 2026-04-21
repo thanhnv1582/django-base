@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apps.stores.infrastructure.models.store_model import Store, StoreMember
+from apps.stores.models import Store, StoreMember
 
 class StoreSerializer(serializers.ModelSerializer):
     """Serializer for Store model."""

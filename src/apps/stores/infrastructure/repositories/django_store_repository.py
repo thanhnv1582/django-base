@@ -9,7 +9,7 @@ from typing import List, Optional
 from apps.stores.domain.entities.store import StoreEntity
 from apps.stores.domain.entities.store_member import StoreMemberEntity
 from apps.stores.domain.repositories.store_repository import IStoreRepository
-from apps.stores.infrastructure.models.store_model import Store, StoreMember
+from apps.stores.models import Store, StoreMember
 
 
 class DjangoStoreRepository(IStoreRepository):

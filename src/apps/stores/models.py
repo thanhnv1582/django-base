@@ -1,5 +1,6 @@
 """
-Store ORM Model.
+Store ORM Models.
+Standard location for Django model discovery.
 """
 from django.db import models
 from django.utils.text import slugify
@@ -22,6 +23,7 @@ class Store(UUIDModel, SoftDeleteModel):
     is_active = models.BooleanField(default=True)
 
     class Meta:
+        app_label = "stores"
         db_table = "stores"
         verbose_name = "store"
         verbose_name_plural = "stores"
@@ -38,7 +40,7 @@ class Store(UUIDModel, SoftDeleteModel):
             name=self.name,
             slug=self.slug,
             description=self.description,
-            logo=self.logo.url if self.logo else None,
+            logo=self.logo,
             address=self.address,
             phone=self.phone,
             is_active=self.is_active,
@@ -62,6 +64,7 @@ class StoreMember(UUIDModel):
     )
 
     class Meta:
+        app_label = "stores"
         db_table = "store_members"
         unique_together = ("store", "user")
         verbose_name = "store member"

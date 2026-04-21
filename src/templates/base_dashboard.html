@@ -56,6 +56,11 @@
                         </a>
                     </li>
                     <li>
+                        <a href="{% url 'dashboard:voucher-list' %}" class="nav-item {% if '/dashboard/vouchers/' in request.path %}active{% endif %}">
+                            <i data-lucide="ticket"></i> Vouchers
+                        </a>
+                    </li>
+                    <li>
                         <a href="#" class="nav-item">
                             <i data-lucide="package"></i> Products
                         </a>
